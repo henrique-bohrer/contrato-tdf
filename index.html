@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termo de Compromisso - TDF Pro</title>
+</head>
+
+<body>
+
+  <header>
+    <h1>TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO</h1>
+    <h2>PROGRAMA TDF PRÓ – TRILHA DO FUTEBOL</h2>
+  </header>
+
+  <main>
+    <form action="#" method="POST">
+
+      <fieldset>
+        <legend><strong>Dados do Responsável Legal</strong></legend>
+        <p>
+          Eu, <input type="text" id="nome_responsavel" name="nome_responsavel"
+            placeholder="Nome completo do responsável" size="50" required>,
+          portador(a) do CPF nº <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>,
+          telefone para contato <input type="tel" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required>,
+          na qualidade de pai/mãe ou responsável legal pelo(a) atleta:
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend><strong>Dados do Atleta</strong></legend>
+        <p>
+          <label for="nome_atleta">Nome completo do atleta:</label><br>
+          <input type="text" id="nome_atleta" name="nome_atleta" size="50" required>
+        </p>
+        <p>
+          <label for="nascimento_atleta">Data de nascimento do atleta:</label><br>
+          <input type="date" id="nascimento_atleta" name="nascimento_atleta" required>
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend><strong>Compromisso</strong></legend>
+        <p>
+          Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no
+          Programa TDF Pró, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação
+          do pagamento junto ao coordenador responsável pela vaga.
+        </p>
+        <p>
+          <label for="coordenador">Nome do coordenador de vaga:</label><br>
+          <input type="text" id="coordenador" name="coordenador" size="50" required>
+        </p>
+      </fieldset>
+
+      <section>
+        <h3>Declaro estar ciente de que:</h3>
+        <ul>
+          <li>O acesso ao programa TDF Pró, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido
+            somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.</li>
+          <li>O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida
+            turma, sem garantia de reposição futura nas mesmas condições.</li>
+          <li>Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e
+            compreendidas no momento da reserva da vaga.</li>
+        </ul>
+        <p><strong>Trilha do Futebol S.A</strong></p>
+      </section>
+
+      <fieldset>
+        <legend><strong>Confirmação e Assinatura</strong></legend>
+        <input type="checkbox" id="aceite" name="aceite" required>
+        <label for="aceite">Li e concordo com todos os termos e condições apresentados neste documento e confirmo que as
+          informações preenchidas são verdadeiras.</label>
+      </fieldset>
+
+      <br>
+      <button type="submit">Assinar e Enviar Termo</button>
+    </form>
+  </main>
+
+</body>
+
+</html>

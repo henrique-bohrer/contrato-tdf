@@ -1,0 +1,112 @@
+/* Importa uma fonte do Google Fonts para um visual mais moderno */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Estilos gerais para o corpo da página */
+body {
+    font-family: 'Roboto', sans-serif; /* Define a fonte principal */
+    background-color: #f4f4f9; /* Um fundo cinza claro, suave */
+    color: #333; /* Cor do texto principal (cinza escuro) */
+    line-height: 1.6; /* Espaçamento entre as linhas para melhor legibilidade */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Container principal para o formulário */
+.container {
+    background-color: #ffffff; /* Fundo branco para a área do contrato */
+    padding: 30px 40px;
+    border-radius: 8px; /* Cantos arredondados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave para dar profundidade */
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Estilo para os títulos principais */
+header h1, header h2 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+header h1 {
+    font-size: 1.8em;
+    margin-bottom: 5px;
+}
+
+header h2 {
+    font-size: 1.2em;
+    font-weight: 400;
+    margin-top: 0;
+    color: #FEEB00; /* Cor principal destacando o nome do programa */
+    background-color: #333;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+/* Agrupamento de campos do formulário */
+fieldset {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Título de cada agrupamento */
+legend {
+    font-weight: bold;
+    color: #333;
+    padding: 0 10px;
+}
+
+/* Estilo dos campos de texto, data e telefone */
+input[type="text"],
+input[type="tel"],
+input[type="date"] {
+    width: calc(100% - 20px); /* Ocupa 100% da largura menos o padding */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-top: 5px;
+}
+
+/* Destaque visual quando um campo é selecionado */
+input:focus {
+    border-color: #FEEB00;
+    outline: none; /* Remove a borda padrão do navegador */
+    box-shadow: 0 0 5px rgba(254, 235, 0, 0.5);
+}
+
+/* Estilo para o botão de envio */
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333; /* Cor do texto do botão */
+    background-color: #FEEB00; /* Cor de fundo principal */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; /* Muda o cursor para uma mãozinha */
+    transition: background-color 0.3s ease; /* Efeito suave na transição de cor */
+}
+
+/* Efeito ao passar o mouse sobre o botão */
+button[type="submit"]:hover {
+    background-color: #e4d300; /* Um tom de amarelo um pouco mais escuro */
+}
+
+/* Estilizando a seção de confirmação (checkbox) */
+.confirmacao {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px; /* Espaço entre o checkbox e o texto */
+}
+
+input[type="checkbox"] {
+    margin-top: 5px;
+    width: 18px;
+    height: 18px;
+}
