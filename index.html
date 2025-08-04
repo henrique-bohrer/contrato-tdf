@@ -37,15 +37,15 @@
           <legend><strong>Compromisso</strong></legend>
           <p>Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no
             Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação
-            do pagamento junto ao coordenador responsável pela vaga.</p>
-          <p><label for="coordenador">Nome do coordenador de vaga:</label><br><input type="text" id="coordenador"
-              name="coordenador" size="50" required></p>
+            do pagamento junto ao consultor responsável pela vaga.</p>
+          <p><label for="consultor">Nome do consultor de vaga:</label><br><input type="text" id="consultor"
+              name="consultor" size="50" required></p>
         </fieldset>
         <section>
           <h3>Declaro estar ciente de que:</h3>
           <ul>
             <li>O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido
-              somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.</li>
+              somente após a confirmação do pagamento na data combinada com o consultor da Trilha do Futebol.</li>
             <li>O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida
               turma, sem garantia de reposição futura nas mesmas condições.</li>
             <li>Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e
@@ -78,15 +78,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // --- Variáveis para o Modal ---
       const modalOverlay = document.getElementById('modal-overlay');
       const modalConfirmBtn = document.getElementById('modal-confirm-btn');
       const modalCancelBtn = document.getElementById('modal-cancel-btn');
 
-      // --- Lógica Principal do Botão "Gerar PDF" ---
       const btnGerarPdf = document.getElementById('btn-gerar-pdf');
       btnGerarPdf.addEventListener('click', function () {
-        // 1. Validação do formulário
         const form = document.getElementById('meu-formulario');
         const requiredInputs = form.querySelectorAll('[required]');
         let isFormValid = true;
@@ -100,35 +97,24 @@
           alert('Por favor, preencha todos os campos obrigatórios e aceite os termos para continuar.');
           return;
         }
-
-        // 2. Se for válido, mostra o nosso modal customizado
         modalOverlay.classList.add('visible');
       });
 
-      // --- Funções do Modal ---
-
-      // Fecha o modal se clicar em "Revisar"
       modalCancelBtn.addEventListener('click', () => {
         modalOverlay.classList.remove('visible');
       });
 
-      // Fecha o modal se clicar fora da caixa branca
       modalOverlay.addEventListener('click', (event) => {
         if (event.target === modalOverlay) {
           modalOverlay.classList.remove('visible');
         }
       });
 
-      // AÇÃO PRINCIPAL: Se clicar em "Sim, Gerar PDF"
       modalConfirmBtn.addEventListener('click', () => {
-        // Esconde o modal primeiro
         modalOverlay.classList.remove('visible');
-
-        // Executa a criação do PDF
         gerarPdfNativo();
       });
 
-      // --- Função que gera o PDF (separada para melhor organização) ---
       function gerarPdfNativo() {
         // Pega os valores dos campos
         const nomeResponsavel = document.getElementById('nome_responsavel').value;
@@ -136,10 +122,10 @@
         const telefone = document.getElementById('telefone').value;
         const nomeAtleta = document.getElementById('nome_atleta').value;
         const nascimentoAtleta = document.getElementById('nascimento_atleta').value;
-        const nomeCoordenador = document.getElementById('coordenador').value;
+        // ALTERAÇÃO DE VARIÁVEL E ID AQUI
+        const nomeConsultor = document.getElementById('consultor').value;
         const dataFormatada = nascimentoAtleta.split('-').reverse().join('/');
 
-        // Inicia o PDF
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const margin = 20;
@@ -172,17 +158,17 @@
         currentY += 5;
 
         pdf.setFont('helvetica', 'normal');
-        addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação do pagamento junto ao coordenador ${nomeCoordenador}, responsável pela vaga.`);
+        // ALTERAÇÃO DE TEXTO E VARIÁVEL AQUI
+        addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início immediately após a confirmação do pagamento junto ao consultor ${nomeConsultor}, responsável pela vaga.`);
         currentY += 5;
 
         pdf.setFont('helvetica', 'bold');
         addWrappedText('Declaro estar ciente de que:');
 
         pdf.setFont('helvetica', 'normal');
-        addWrappedText('• O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.');
+        // ALTERAÇÃO DE TEXTO AQUI
+        addWrappedText('• O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o consultor da Trilha do Futebol.');
         addWrappedText('• O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida turma, sem garantia de reposição futura nas mesmas condições.');
-
-        // CORREÇÃO DO ERRO DE DIGITAÇÃO AQUI:
         addWrappedText('• Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e compreendidas no momento da reserva da vaga.');
         currentY += 10;
 
@@ -190,12 +176,20 @@
         pdf.text(`Curitiba, ${dataAtual}.`, margin, currentY);
         currentY += 25;
 
-        pdf.line(margin, currentY, margin + 80, currentY);
-        currentY += 5;
+        // --- LÓGICA DA ASSINATURA ATUALIZADA ---
+        // Escreve o nome do responsável
+        pdf.setFont('helvetica', 'normal');
         pdf.text(nomeResponsavel, margin, currentY);
-        pdf.text('(Responsável Legal)', margin, currentY + 5);
-        currentY += 15;
+        currentY += 1; // Pequeno espaço para a linha não cortar o texto
 
+        // Desenha a linha por baixo do nome
+        pdf.line(margin, currentY, margin + 90, currentY);
+        currentY += 5;
+
+        // Escreve a descrição "(Responsável Legal)" abaixo da linha
+        pdf.text('(Responsável Legal)', margin, currentY);
+
+        currentY += 15;
         pdf.setFont('helvetica', 'bold');
         pdf.text('Trilha do Futebol S.A', margin, currentY);
 
