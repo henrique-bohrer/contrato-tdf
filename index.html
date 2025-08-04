@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Termo de Compromisso - TDF Pró</title>
+  <title>Termo de Compromisso - TDF Pro</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,7 +13,7 @@
   <div class="container" id="formulario-contrato">
     <header>
       <h1>TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO</h1>
-      <h2>PROGRAMA TDF PRÓ – TRILHA DO FUTEBOL</h2>
+      <h2>PROGRAMA TDF PRO – TRILHA DO FUTEBOL</h2>
     </header>
 
     <main>
@@ -36,7 +36,7 @@
         <fieldset>
           <legend><strong>Compromisso</strong></legend>
           <p>Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no
-            Programa TDF Pró, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação
+            Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação
             do pagamento junto ao coordenador responsável pela vaga.</p>
           <p><label for="coordenador">Nome do coordenador de vaga:</label><br><input type="text" id="coordenador"
               name="coordenador" size="50" required></p>
@@ -44,7 +44,7 @@
         <section>
           <h3>Declaro estar ciente de que:</h3>
           <ul>
-            <li>O acesso ao programa TDF Pró, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido
+            <li>O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido
               somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.</li>
             <li>O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida
               turma, sem garantia de reposição futura nas mesmas condições.</li>
@@ -158,7 +158,7 @@
         pdf.text('TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO', pageWidth / 2, currentY, { align: 'center' });
         currentY += 7;
         pdf.setFontSize(12);
-        pdf.text('PROGRAMA TDF PRÓ – TRILHA DO FUTEBOL', pageWidth / 2, currentY, { align: 'center' });
+        pdf.text('PROGRAMA TDF PRO – TRILHA DO FUTEBOL', pageWidth / 2, currentY, { align: 'center' });
         currentY += 15;
 
         pdf.setFont('helvetica', 'normal');
@@ -172,14 +172,14 @@
         currentY += 5;
 
         pdf.setFont('helvetica', 'normal');
-        addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pró, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação do pagamento junto ao coordenador ${nomeCoordenador}, responsável pela vaga.`);
+        addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação do pagamento junto ao coordenador ${nomeCoordenador}, responsável pela vaga.`);
         currentY += 5;
 
         pdf.setFont('helvetica', 'bold');
         addWrappedText('Declaro estar ciente de que:');
 
         pdf.setFont('helvetica', 'normal');
-        addWrappedText('• O acesso ao programa TDF Pró, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.');
+        addWrappedText('• O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.');
         addWrappedText('• O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida turma, sem garantia de reposição futura nas mesmas condições.');
 
         // CORREÇÃO DO ERRO DE DIGITAÇÃO AQUI:
