@@ -4,80 +4,206 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Termo de Compromisso - TDF Pro</title>
+  <title>Termo de Compromisso - TDF Pró</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <header>
-    <h1>TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO</h1>
-    <h2>PROGRAMA TDF PRÓ – TRILHA DO FUTEBOL</h2>
-  </header>
+  <div class="container" id="formulario-contrato">
+    <header>
+      <h1>TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO</h1>
+      <h2>PROGRAMA TDF PRÓ – TRILHA DO FUTEBOL</h2>
+    </header>
 
-  <main>
-    <form action="#" method="POST">
+    <main>
+      <form id="meu-formulario">
+        <fieldset>
+          <legend><strong>Dados do Responsável Legal</strong></legend>
+          <p>Eu, <input type="text" id="nome_responsavel" name="nome_responsavel"
+              placeholder="Nome completo do responsável" size="50" required>, portador(a) do CPF nº <input type="text"
+              id="cpf" name="cpf" placeholder="000.000.000-00" required>, telefone para contato <input type="tel"
+              id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required>, na qualidade de pai/mãe ou
+            responsável legal pelo(a) atleta:</p>
+        </fieldset>
+        <fieldset>
+          <legend><strong>Dados do Atleta</strong></legend>
+          <p><label for="nome_atleta">Nome completo do atleta:</label><br><input type="text" id="nome_atleta"
+              name="nome_atleta" size="50" required></p>
+          <p><label for="nascimento_atleta">Data de nascimento do atleta:</label><br><input type="date"
+              id="nascimento_atleta" name="nascimento_atleta" required></p>
+        </fieldset>
+        <fieldset>
+          <legend><strong>Compromisso</strong></legend>
+          <p>Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no
+            Programa TDF Pró, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação
+            do pagamento junto ao coordenador responsável pela vaga.</p>
+          <p><label for="coordenador">Nome do coordenador de vaga:</label><br><input type="text" id="coordenador"
+              name="coordenador" size="50" required></p>
+        </fieldset>
+        <section>
+          <h3>Declaro estar ciente de que:</h3>
+          <ul>
+            <li>O acesso ao programa TDF Pró, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido
+              somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.</li>
+            <li>O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida
+              turma, sem garantia de reposição futura nas mesmas condições.</li>
+            <li>Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e
+              compreendidas no momento da reserva da vaga.</li>
+          </ul>
+          <p><strong>Trilha do Futebol S.A</strong></p>
+        </section>
+        <div class="confirmacao">
+          <input type="checkbox" id="aceite" name="aceite" required>
+          <label for="aceite">Li e concordo com todos os termos e condições apresentados neste documento e confirmo que
+            as informações preenchidas são verdadeiras.</label>
+        </div>
+        <br>
+        <button type="button" id="btn-gerar-pdf">Assinar e Gerar PDF</button>
+      </form>
+    </main>
+  </div>
 
-      <fieldset>
-        <legend><strong>Dados do Responsável Legal</strong></legend>
-        <p>
-          Eu, <input type="text" id="nome_responsavel" name="nome_responsavel"
-            placeholder="Nome completo do responsável" size="50" required>,
-          portador(a) do CPF nº <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>,
-          telefone para contato <input type="tel" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required>,
-          na qualidade de pai/mãe ou responsável legal pelo(a) atleta:
-        </p>
-      </fieldset>
+  <div id="modal-overlay">
+    <div id="modal">
+      <h3>Confirmação</h3>
+      <p>Todas as informações preenchidas estão corretas?</p>
+      <div class="modal-botoes">
+        <button id="modal-cancel-btn">Revisar</button>
+        <button id="modal-confirm-btn">Sim, Gerar PDF</button>
+      </div>
+    </div>
+  </div>
 
-      <fieldset>
-        <legend><strong>Dados do Atleta</strong></legend>
-        <p>
-          <label for="nome_atleta">Nome completo do atleta:</label><br>
-          <input type="text" id="nome_atleta" name="nome_atleta" size="50" required>
-        </p>
-        <p>
-          <label for="nascimento_atleta">Data de nascimento do atleta:</label><br>
-          <input type="date" id="nascimento_atleta" name="nascimento_atleta" required>
-        </p>
-      </fieldset>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // --- Variáveis para o Modal ---
+      const modalOverlay = document.getElementById('modal-overlay');
+      const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+      const modalCancelBtn = document.getElementById('modal-cancel-btn');
 
-      <fieldset>
-        <legend><strong>Compromisso</strong></legend>
-        <p>
-          Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no
-          Programa TDF Pró, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação
-          do pagamento junto ao coordenador responsável pela vaga.
-        </p>
-        <p>
-          <label for="coordenador">Nome do coordenador de vaga:</label><br>
-          <input type="text" id="coordenador" name="coordenador" size="50" required>
-        </p>
-      </fieldset>
+      // --- Lógica Principal do Botão "Gerar PDF" ---
+      const btnGerarPdf = document.getElementById('btn-gerar-pdf');
+      btnGerarPdf.addEventListener('click', function () {
+        // 1. Validação do formulário
+        const form = document.getElementById('meu-formulario');
+        const requiredInputs = form.querySelectorAll('[required]');
+        let isFormValid = true;
+        requiredInputs.forEach(input => {
+          if ((input.type === 'checkbox' && !input.checked) || (input.type !== 'checkbox' && !input.value)) {
+            isFormValid = false;
+          }
+        });
 
-      <section>
-        <h3>Declaro estar ciente de que:</h3>
-        <ul>
-          <li>O acesso ao programa TDF Pró, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido
-            somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.</li>
-          <li>O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida
-            turma, sem garantia de reposição futura nas mesmas condições.</li>
-          <li>Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e
-            compreendidas no momento da reserva da vaga.</li>
-        </ul>
-        <p><strong>Trilha do Futebol S.A</strong></p>
-      </section>
+        if (!isFormValid) {
+          alert('Por favor, preencha todos os campos obrigatórios e aceite os termos para continuar.');
+          return;
+        }
 
-      <fieldset>
-        <legend><strong>Confirmação e Assinatura</strong></legend>
-        <input type="checkbox" id="aceite" name="aceite" required>
-        <label for="aceite">Li e concordo com todos os termos e condições apresentados neste documento e confirmo que as
-          informações preenchidas são verdadeiras.</label>
-      </fieldset>
+        // 2. Se for válido, mostra o nosso modal customizado
+        modalOverlay.classList.add('visible');
+      });
 
-      <br>
-      <button type="submit">Assinar e Enviar Termo</button>
-    </form>
-  </main>
+      // --- Funções do Modal ---
 
+      // Fecha o modal se clicar em "Revisar"
+      modalCancelBtn.addEventListener('click', () => {
+        modalOverlay.classList.remove('visible');
+      });
+
+      // Fecha o modal se clicar fora da caixa branca
+      modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+          modalOverlay.classList.remove('visible');
+        }
+      });
+
+      // AÇÃO PRINCIPAL: Se clicar em "Sim, Gerar PDF"
+      modalConfirmBtn.addEventListener('click', () => {
+        // Esconde o modal primeiro
+        modalOverlay.classList.remove('visible');
+
+        // Executa a criação do PDF
+        gerarPdfNativo();
+      });
+
+      // --- Função que gera o PDF (separada para melhor organização) ---
+      function gerarPdfNativo() {
+        // Pega os valores dos campos
+        const nomeResponsavel = document.getElementById('nome_responsavel').value;
+        const cpf = document.getElementById('cpf').value;
+        const telefone = document.getElementById('telefone').value;
+        const nomeAtleta = document.getElementById('nome_atleta').value;
+        const nascimentoAtleta = document.getElementById('nascimento_atleta').value;
+        const nomeCoordenador = document.getElementById('coordenador').value;
+        const dataFormatada = nascimentoAtleta.split('-').reverse().join('/');
+
+        // Inicia o PDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const margin = 20;
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        let currentY = margin;
+
+        function addWrappedText(text, options) {
+          const lines = pdf.splitTextToSize(text, pageWidth - margin * 2);
+          pdf.text(lines, margin, currentY, options);
+          currentY += (lines.length * 5) + 3;
+        }
+
+        // Constrói o PDF
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(14);
+        pdf.text('TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO', pageWidth / 2, currentY, { align: 'center' });
+        currentY += 7;
+        pdf.setFontSize(12);
+        pdf.text('PROGRAMA TDF PRÓ – TRILHA DO FUTEBOL', pageWidth / 2, currentY, { align: 'center' });
+        currentY += 15;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(11);
+        addWrappedText(`Eu, ${nomeResponsavel}, portador(a) do CPF nº ${cpf}, telefone para contato ${telefone}, na qualidade de pai/mãe ou responsável legal pelo(a) atleta:`);
+        currentY += 5;
+
+        pdf.setFont('helvetica', 'bold');
+        addWrappedText(`Nome completo do atleta: ${nomeAtleta}`);
+        addWrappedText(`Data de nascimento do atleta: ${dataFormatada}`);
+        currentY += 5;
+
+        pdf.setFont('helvetica', 'normal');
+        addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pró, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação do pagamento junto ao coordenador ${nomeCoordenador}, responsável pela vaga.`);
+        currentY += 5;
+
+        pdf.setFont('helvetica', 'bold');
+        addWrappedText('Declaro estar ciente de que:');
+
+        pdf.setFont('helvetica', 'normal');
+        addWrappedText('• O acesso ao programa TDF Pró, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o coordenador da Trilha do Futebol.');
+        addWrappedText('• O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida turma, sem garantia de reposição futura nas mesmas condições.');
+
+        // CORREÇÃO DO ERRO DE DIGITAÇÃO AQUI:
+        addWrappedText('• Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e compreendidas no momento da reserva da vaga.');
+        currentY += 10;
+
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        pdf.text(`Curitiba, ${dataAtual}.`, margin, currentY);
+        currentY += 25;
+
+        pdf.line(margin, currentY, margin + 80, currentY);
+        currentY += 5;
+        pdf.text(nomeResponsavel, margin, currentY);
+        pdf.text('(Responsável Legal)', margin, currentY + 5);
+        currentY += 15;
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Trilha do Futebol S.A', margin, currentY);
+
+        const nomeArquivo = `Termo_Compromisso_${nomeAtleta.replace(/ /g, '_')}.pdf`;
+        pdf.save(nomeArquivo);
+      }
+    });
+  </script>
 </body>
 
 </html>
