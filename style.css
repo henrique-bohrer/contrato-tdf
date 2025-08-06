@@ -253,3 +253,73 @@ button[type="button"]:hover {
 #modal-cancel-btn:hover {
     background-color: #ccc;
 }
+
+
+/* --- MODAL DE SUCESSO --- */
+#success-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001; /* Z-index maior para ficar sobre o outro modal se necessário */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#success-modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#success-modal {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 90%;
+    max-width: 450px;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+#success-modal-overlay.visible #success-modal {
+    transform: scale(1);
+}
+
+#success-modal h3 {
+    color: #27ae60; /* Verde para sucesso */
+    font-size: 1.8em;
+    margin-top: 0;
+}
+
+#success-modal p {
+    color: #555;
+    font-size: 1.1em;
+}
+
+#success-modal-btn {
+    display: block;
+    width: 100%;
+    margin-top: 25px;
+    padding: 12px;
+    font-size: 1em;
+    font-weight: 700;
+    color: #fff;
+    background-color: #27ae60; /* Verde para sucesso */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#success-modal-btn:hover {
+    background-color: #229954;
+    transform: scale(1.02);
+}

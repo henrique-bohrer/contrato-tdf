@@ -75,14 +75,29 @@
     </div>
   </div>
 
+  <div id="success-modal-overlay">
+    <div id="success-modal">
+      <h3>Sucesso!</h3>
+      <p>Contrato enviado com sucesso! Uma notificação foi enviada para nossa equipe e o seu PDF será gerado em
+        instantes.</p>
+      <button id="success-modal-btn">Ok</button>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Modais
       const modalOverlay = document.getElementById('modal-overlay');
+      const successModalOverlay = document.getElementById('success-modal-overlay');
+
+      // Botões
+      const btnGerarPdf = document.getElementById('btn-gerar-pdf');
       const modalConfirmBtn = document.getElementById('modal-confirm-btn');
       const modalCancelBtn = document.getElementById('modal-cancel-btn');
+      const successModalBtn = document.getElementById('success-modal-btn');
 
-      const btnGerarPdf = document.getElementById('btn-gerar-pdf');
+      // --- Lógica para o Modal de Confirmação ---
       btnGerarPdf.addEventListener('click', function () {
         const form = document.getElementById('meu-formulario');
         const requiredInputs = form.querySelectorAll('[required]');
@@ -110,9 +125,47 @@
         }
       });
 
+      // --- Lógica para Envio e Modal de Sucesso ---
       modalConfirmBtn.addEventListener('click', () => {
         modalOverlay.classList.remove('visible');
-        gerarPdfNativo();
+
+        const formData = {
+          nome_responsavel: document.getElementById('nome_responsavel').value,
+          nome_atleta: document.getElementById('nome_atleta').value,
+          consultor: document.getElementById('consultor').value,
+          cpf: document.getElementById('cpf').value,
+          telefone: document.getElementById('telefone').value,
+          nascimento_atleta: document.getElementById('nascimento_atleta').value,
+        };
+
+        fetch('http://localhost:3000/send-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+          .then(async response => {
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({ message: 'Erro desconhecido no servidor.' }));
+              throw new Error(err.message || 'A resposta da rede não foi OK.');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Notificação enviada:', data.message);
+            // Mostra o modal de sucesso em vez do alert
+            successModalOverlay.classList.add('visible');
+          })
+          .catch(error => {
+            console.error('Houve um problema com a operação de fetch:', error);
+            // Re-utiliza o alert para erros, pois são menos comuns
+            alert('Houve um problema ao enviar a notificação. O PDF não foi gerado.\n\nPor favor, verifique o console do navegador (F12) e o terminal do servidor para mais detalhes.\n\nErro: ' + error.message);
+          });
+      });
+
+      // --- Lógica do botão de fechar do Modal de Sucesso ---
+      successModalBtn.addEventListener('click', () => {
+        successModalOverlay.classList.remove('visible');
+        gerarPdfNativo(); // Gera o PDF depois de fechar o modal de sucesso
       });
 
       function gerarPdfNativo() {
