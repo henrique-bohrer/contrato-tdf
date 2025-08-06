@@ -1,62 +1,62 @@
-// 1. Importar as ferramentas que instalámos
+// Ficheiro: servidor.js
+
 const express = require('express');
-const nodemailer = require('nodemailer');
 const cors = require('cors');
+// Importamos a ferramenta da Twilio em vez do Nodemailer
+const twilio = require('twilio');
 
-// 2. Configurar o servidor
 const app = express();
-app.use(cors()); // Permite que o nosso site (frontend) aceda a este servidor
-app.use(express.json()); // Permite que o servidor entenda os dados JSON que o site vai enviar
+app.use(cors());
+app.use(express.json());
 
-// 3. Configurar o serviço de e-mail
-// CUIDADO: Use um e-mail de teste ou crie uma "Senha de app" no seu Gmail.
-// NUNCA coloque a sua senha principal diretamente no código em projetos reais.
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // Pode usar outros serviços como Outlook, etc.
-    auth: {
-        user: 'henrique300415@gmail.com', // SUBSTITUA PELO SEU E-MAIL
-        pass: 'Hb5207418@25'       // SUBSTITUA PELA SUA SENHA (ou senha de app)
-    }
-});
+// ==========================================================
+// CONFIGURAÇÃO DA TWILIO
+// ==========================================================
+// Substitua pelos seus dados do painel da Twilio
+const accountSid = 'AC51bea20b5af351e16804058c787bbc90'; // O seu Account SID
+const authToken = 'e4223e7e2a16e758fe0c30f4cad5c84f';     // O seu Auth Token
 
-// 4. Criar a "rota" que vai receber os dados e enviar o e-mail
+// Cria o "cliente" da Twilio para enviar mensagens
+const client = twilio(accountSid, authToken);
+
 app.post('/enviar-notificacao', (req, res) => {
     console.log('Dados recebidos:', req.body);
-
     const dados = req.body;
 
-    // Monta o conteúdo do e-mail com os dados recebidos do formulário
-    const mailOptions = {
-        from: 'henrique300415@gmail.com',     // O seu e-mail
-        to: 'henrique300415@gmail.com', // SUBSTITUA pelo e-mail que deve receber a notificação
-        subject: `Novo Contrato Assinado - Atleta: ${dados.nomeAtleta}`,
-        html: `
-            <h1>Novo Contrato Assinado no Site!</h1>
-            <p>Um novo termo de compromisso foi preenchido e assinado.</p>
-            <h2>Detalhes do Contrato:</h2>
-            <ul>
-                <li><strong>Responsável:</strong> ${dados.nomeResponsavel}</li>
-                <li><strong>CPF do Responsável:</strong> ${dados.cpf}</li>
-                <li><strong>Telefone:</strong> ${dados.telefone}</li>
-                <li><strong>Nome do Atleta:</strong> ${dados.nomeAtleta}</li>
-                <li><strong>Data de Nasc. do Atleta:</strong> ${dados.dataFormatada}</li>
-                <li><strong>Consultor da Vaga:</strong> ${dados.nomeConsultor}</li>
-            </ul>
-        `
-    };
+    // Monta o texto da mensagem do WhatsApp
+    const mensagem = `
+*Novo Contrato TDF Assinado!* 📄⚽
 
-    // 5. Envia o e-mail
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Erro ao enviar e-mail:', error);
-            return res.status(500).send('Erro ao enviar e-mail.');
-        }
-        console.log('E-mail enviado com sucesso:', info.response);
-        res.status(200).send('Notificação enviada com sucesso!');
-    });
+Um novo termo foi preenchido com os seguintes dados:
+
+*Responsável:* ${dados.nomeResponsavel}
+*CPF:* ${dados.cpf}
+*Telefone:* ${dados.telefone}
+*Atleta:* ${dados.nomeAtleta}
+*Nascimento:* ${dados.dataFormatada}
+*Consultor:* ${dados.nomeConsultor}
+    `;
+
+    // Envia a mensagem de WhatsApp usando a Twilio
+    client.messages
+        .create({
+            body: mensagem,
+            // Este é o número do Sandbox da Twilio
+            from: 'whatsapp:+14155238886',
+            // SUBSTITUA pelo seu número de telefone verificado no Sandbox
+            // Formato: whatsapp:+5541999998888 (com código do país e estado)
+            to: 'whatsapp:+5549984287347'
+        })
+        .then(message => {
+            console.log('Mensagem enviada com sucesso! SID:', message.sid);
+            res.status(200).send('Notificação de WhatsApp enviada com sucesso!');
+        })
+        .catch(error => {
+            console.error('Erro ao enviar mensagem de WhatsApp:', error);
+            res.status(500).send('Erro ao enviar notificação de WhatsApp.');
+        });
 });
 
-// 6. Iniciar o servidor para que ele fique "à escuta" por pedidos
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor de notificações a correr na porta ${PORT}`);
