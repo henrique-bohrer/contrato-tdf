@@ -78,7 +78,7 @@
   <div id="success-modal-overlay">
     <div id="success-modal">
       <h3>Sucesso!</h3>
-      <p>Contrato enviado com sucesso! Uma notificação foi enviada para nossa equipe e o seu PDF será gerado em
+      <p>Sua assinatura foi registrada! Uma notificação foi enviada para nossa equipe e o seu PDF será gerado em
         instantes.</p>
       <button id="success-modal-btn">Ok</button>
     </div>
@@ -98,7 +98,6 @@
       const modalCancelBtn = document.getElementById('modal-cancel-btn');
       const successModalBtn = document.getElementById('success-modal-btn');
 
-      // --- Lógica para o Modal de Confirmação ---
       btnGerarPdf.addEventListener('click', function () {
         const form = document.getElementById('meu-formulario');
         const requiredInputs = form.querySelectorAll('[required]');
@@ -116,20 +115,17 @@
         modalOverlay.classList.add('visible');
       });
 
-      modalCancelBtn.addEventListener('click', () => {
+      function esconderModalConfirmacao() {
         modalOverlay.classList.remove('visible');
-      });
+      }
 
+      modalCancelBtn.addEventListener('click', esconderModalConfirmacao);
       modalOverlay.addEventListener('click', (event) => {
-        if (event.target === modalOverlay) {
-          modalOverlay.classList.remove('visible');
-        }
+        if (event.target === modalOverlay) esconderModalConfirmacao();
       });
 
-      // --- Lógica para Envio e Modal de Sucesso ---
       modalConfirmBtn.addEventListener('click', () => {
-        modalOverlay.classList.remove('visible');
-
+        esconderModalConfirmacao();
         const dadosDoContrato = {
           nome_responsavel: document.getElementById('nome_responsavel').value,
           nome_atleta: document.getElementById('nome_atleta').value,
@@ -139,109 +135,132 @@
           nascimento_atleta: document.getElementById('nascimento_atleta').value,
         };
 
-        // --- ATUALIZAÇÃO IMPORTANTE AQUI ---
-        // O endereço foi alterado para o caminho da função Netlify
         fetch('/.netlify/functions/enviar-notificacao', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dadosDoContrato),
         })
           .then(response => {
-            if (!response.ok) {
-              // Se a resposta do servidor não for OK, lança um erro para o bloco catch
-              throw new Error('A resposta da rede não foi OK.');
-            }
+            if (!response.ok) throw new Error('A resposta da rede não foi OK.');
             return response.json();
           })
           .then(data => {
             console.log('Resposta da função Netlify:', data.message);
-            // Mostra o modal de sucesso
             successModalOverlay.classList.add('visible');
           })
           .catch(error => {
             console.error('Houve um problema com a operação de fetch:', error);
-            alert('Houve um problema ao enviar a notificação. O PDF não foi gerado.\n\nPor favor, verifique se o servidor está a correr (se estiver em modo local) ou se a função Netlify foi publicada corretamente.\n\nErro: ' + error.message);
+            alert('Houve um problema ao enviar a notificação. O PDF não foi gerado.\n\nErro: ' + error.message);
           });
       });
 
-      // --- Lógica do botão de fechar do Modal de Sucesso ---
       successModalBtn.addEventListener('click', () => {
         successModalOverlay.classList.remove('visible');
-        gerarPdfNativo(); // Gera o PDF depois de fechar o modal de sucesso
+        gerarPdfNativo();
       });
 
+      // ==========================================================
+      // NOVA FUNÇÃO DE GERAR PDF COM MARCA D'ÁGUA DINÂMICA
+      // ==========================================================
 
-      function gerarPdfNativo() {
-        const nomeResponsavel = document.getElementById('nome_responsavel').value;
-        const cpf = document.getElementById('cpf').value;
-        const telefone = document.getElementById('telefone').value;
-        const nomeAtleta = document.getElementById('nome_atleta').value;
-        const nascimentoAtleta = document.getElementById('nascimento_atleta').value;
-        const nomeConsultor = document.getElementById('consultor').value;
-        const dataFormatada = nascimentoAtleta.split('-').reverse().join('/');
+      // Função auxiliar para converter a imagem para Base64
+      const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const margin = 20;
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        let currentY = margin;
+      async function gerarPdfNativo() {
+        try {
+          // Carrega a imagem do logo dinamicamente
+          const response = await fetch('logo-TDF-sem-fundo.png');
+          if (!response.ok) throw new Error('Não foi possível encontrar a imagem do logo.');
 
-        function addWrappedText(text, options) {
-          const lines = pdf.splitTextToSize(text, pageWidth - margin * 2);
-          pdf.text(lines, margin, currentY, options);
-          currentY += (lines.length * 5) + 3;
+          const blob = await response.blob();
+          const watermarkImgData = await toBase64(blob);
+
+          const nomeResponsavel = document.getElementById('nome_responsavel').value;
+          const cpf = document.getElementById('cpf').value;
+          const telefone = document.getElementById('telefone').value;
+          const nomeAtleta = document.getElementById('nome_atleta').value;
+          const nascimentoAtleta = document.getElementById('nascimento_atleta').value;
+          const nomeConsultor = document.getElementById('consultor').value;
+          const dataFormatada = nascimentoAtleta.split('-').reverse().join('/');
+
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const margin = 20;
+          let currentY = margin;
+
+          // --- Adicionar a Marca D'água ---
+          pdf.setGState(new pdf.GState({ opacity: 0.08 }));
+          pdf.addImage(watermarkImgData, 'PNG', 40, 90, 130, 85);
+          pdf.setGState(new pdf.GState({ opacity: 1 }));
+
+          function addWrappedText(text, options) {
+            const lines = pdf.splitTextToSize(text, pageWidth - margin * 2);
+            pdf.text(lines, margin, currentY, options);
+            currentY += (lines.length * 5) + 3;
+          }
+
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(14);
+          pdf.text('TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO', pageWidth / 2, currentY, { align: 'center' });
+          currentY += 7;
+          pdf.setFontSize(12);
+          pdf.text('PROGRAMA TDF PRO – TRILHA DO FUTEBOL', pageWidth / 2, currentY, { align: 'center' });
+          currentY += 15;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(11);
+          addWrappedText(`Eu, ${nomeResponsavel}, portador(a) do CPF nº ${cpf}, telefone para contato ${telefone}, na qualidade de pai/mãe ou responsável legal pelo(a) atleta:`);
+          currentY += 5;
+
+          pdf.setFont('helvetica', 'bold');
+          addWrappedText(`Nome completo do atleta: ${nomeAtleta}`);
+          addWrappedText(`Data de nascimento do atleta: ${dataFormatada}`);
+          currentY += 5;
+
+          pdf.setFont('helvetica', 'normal');
+          addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação do pagamento junto ao consultor ${nomeConsultor}, responsável pela vaga.`);
+          currentY += 5;
+
+          pdf.setFont('helvetica', 'bold');
+          addWrappedText('Declaro estar ciente de que:');
+
+          pdf.setFont('helvetica', 'normal');
+          addWrappedText('• O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o consultor da Trilha do Futebol.');
+          addWrappedText('• O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida turma, sem garantia de reposição futura nas mesmas condições.');
+          addWrappedText('• Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e compreendidas no momento da reserva da vaga.');
+          currentY += 10;
+
+          const dataAtual = new Date().toLocaleDateString('pt-BR');
+          pdf.text(`Curitiba, ${dataAtual}.`, margin, currentY);
+          currentY += 25;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(nomeResponsavel, margin, currentY);
+          currentY += 1;
+
+          pdf.line(margin, currentY, margin + 90, currentY);
+          currentY += 5;
+
+          pdf.text('(Responsável Legal)', margin, currentY);
+
+          currentY += 15;
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Trilha do Futebol S.A', margin, currentY);
+
+          const nomeArquivo = `Termo_Compromisso_${nomeAtleta.replace(/ /g, '_')}.pdf`;
+          pdf.save(nomeArquivo);
+
+        } catch (error) {
+          console.error("Erro ao gerar PDF com marca d'água:", error);
+          alert("Ocorreu um erro ao carregar a imagem da marca d'água. O PDF não foi gerado.");
         }
-
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(14);
-        pdf.text('TERMO DE COMPROMISSO DE PARTICIPAÇÃO E PAGAMENTO', pageWidth / 2, currentY, { align: 'center' });
-        currentY += 7;
-        pdf.setFontSize(12);
-        pdf.text('PROGRAMA TDF PRO – TRILHA DO FUTEBOL', pageWidth / 2, currentY, { align: 'center' });
-        currentY += 15;
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(11);
-        addWrappedText(`Eu, ${nomeResponsavel}, portador(a) do CPF nº ${cpf}, telefone para contato ${telefone}, na qualidade de pai/mãe ou responsável legal pelo(a) atleta:`);
-        currentY += 5;
-
-        pdf.setFont('helvetica', 'bold');
-        addWrappedText(`Nome completo do atleta: ${nomeAtleta}`);
-        addWrappedText(`Data de nascimento do atleta: ${dataFormatada}`);
-        currentY += 5;
-
-        pdf.setFont('helvetica', 'normal');
-        addWrappedText(`Venho por meio deste firmar o compromisso de garantir a participação do(a) atleta acima mencionado(a) no Programa TDF Pro, ofertado pela Trilha do Futebol, na turma que terá início imediatamente após a confirmação do pagamento junto ao consultor ${nomeConsultor}, responsável pela vaga.`);
-        currentY += 5;
-
-        pdf.setFont('helvetica', 'bold');
-        addWrappedText('Declaro estar ciente de que:');
-
-        pdf.setFont('helvetica', 'normal');
-        addWrappedText('• O acesso ao programa TDF Pro, incluindo os encontros, materiais, grupo exclusivo e bônus, será concedido somente após a confirmação do pagamento na data combinada com o consultor da Trilha do Futebol.');
-        addWrappedText('• O não cumprimento do pagamento até a data combinada poderá resultar na perda da vaga para a referida turma, sem garantia de reposição futura nas mesmas condições.');
-        addWrappedText('• Todas as informações relacionadas ao programa, cronograma e condições foram previamente esclarecidas e compreendidas no momento da reserva da vaga.');
-        currentY += 10;
-
-        const dataAtual = new Date().toLocaleDateString('pt-BR');
-        pdf.text(`Curitiba, ${dataAtual}.`, margin, currentY);
-        currentY += 25;
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(nomeResponsavel, margin, currentY);
-        currentY += 1;
-
-        pdf.line(margin, currentY, margin + 90, currentY);
-        currentY += 5;
-
-        pdf.text('(Responsável Legal)', margin, currentY);
-
-        currentY += 15;
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Trilha do Futebol S.A', margin, currentY);
-
-        const nomeArquivo = `Termo_Compromisso_${nomeAtleta.replace(/ /g, '_')}.pdf`;
-        pdf.save(nomeArquivo);
       }
     });
   </script>
