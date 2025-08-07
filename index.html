@@ -146,7 +146,12 @@
           })
           .then(data => {
             console.log('Resposta da função Netlify:', data.message);
+
+            // --- ALTERAÇÃO PRINCIPAL AQUI ---
+            // 1. Mostra o modal de sucesso
             successModalOverlay.classList.add('visible');
+            // 2. IMEDIATAMENTE chama a função para gerar o PDF
+            gerarPdfNativo();
           })
           .catch(error => {
             console.error('Houve um problema com a operação de fetch:', error);
@@ -154,16 +159,12 @@
           });
       });
 
+      // O botão "Ok" agora serve apenas para fechar o modal de sucesso
       successModalBtn.addEventListener('click', () => {
         successModalOverlay.classList.remove('visible');
-        gerarPdfNativo();
       });
 
-      // ==========================================================
-      // NOVA FUNÇÃO DE GERAR PDF COM MARCA D'ÁGUA DINÂMICA
-      // ==========================================================
-
-      // Função auxiliar para converter a imagem para Base64
+      // Função para carregar imagem dinamicamente (para a marca d'água)
       const toBase64 = file => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -173,7 +174,6 @@
 
       async function gerarPdfNativo() {
         try {
-          // Carrega a imagem do logo dinamicamente
           const response = await fetch('logo-TDF-sem-fundo.png');
           if (!response.ok) throw new Error('Não foi possível encontrar a imagem do logo.');
 
@@ -191,11 +191,10 @@
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF('p', 'mm', 'a4');
           const pageWidth = pdf.internal.pageSize.getWidth();
-          const pageHeight = pdf.internal.pageSize.getHeight();
           const margin = 20;
           let currentY = margin;
 
-          // --- Adicionar a Marca D'água ---
+          // Adicionar a Marca D'água
           pdf.setGState(new pdf.GState({ opacity: 0.08 }));
           pdf.addImage(watermarkImgData, 'PNG', 40, 90, 130, 85);
           pdf.setGState(new pdf.GState({ opacity: 1 }));

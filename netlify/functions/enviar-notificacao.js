@@ -1,13 +1,11 @@
 // Ficheiro: /netlify/functions/enviar-notificacao.js
 
-// Usamos uma biblioteca simples para enviar o pedido
 const fetch = require('node-fetch');
 
 // O URL do Webhook será configurado nas variáveis de ambiente da Netlify, por segurança
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
 exports.handler = async (event) => {
-  // A função só aceita pedidos do tipo POST
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -15,6 +13,16 @@ exports.handler = async (event) => {
   try {
     const dados = JSON.parse(event.body);
     const dataFormatada = dados.nascimento_atleta.split('-').reverse().join('/');
+
+    // --- AJUSTE DE FUSO HORÁRIO PARA SÃO PAULO ---
+    // Opções para formatar a data e hora especificando o fuso horário
+    const options = {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric', month: 'numeric', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    };
+    const dataHoraSaoPaulo = new Date().toLocaleString('pt-BR', options);
+    // --- FIM DO AJUSTE ---
 
     const discordMessage = {
       embeds: [{
@@ -28,7 +36,8 @@ exports.handler = async (event) => {
           { name: "Telefone", value: dados.telefone || 'N/A', inline: true },
           { name: "Data de Nasc.", value: dataFormatada || 'N/A', inline: true },
         ],
-        footer: { text: `Contrato assinado em ${new Date().toLocaleString('pt-BR')}` }
+        // Usamos a nova variável com a hora correta
+        footer: { text: `Contrato assinado em ${dataHoraSaoPaulo}` }
       }]
     };
 
